@@ -48,7 +48,12 @@ export const ApiProxySettings: React.FC<ApiProxySettingsProps> = ({
 
     const currentBaseUrl = apiProxyUrl?.trim() || defaultBaseUrl;
     const cleanBaseUrl = currentBaseUrl.replace(/\/+$/, '');
-    const previewUrl = `${cleanBaseUrl}/models/gemini-2.5-flash:generateContent`;
+
+    let previewUrl = `${cleanBaseUrl}/models/gemini-2.5-flash:generateContent`;
+    if (cleanBaseUrl.includes(':streamGenerateContent') ||
+        cleanBaseUrl.includes(':generateContent')){
+        previewUrl = cleanBaseUrl;
+    }
 
     return (
         <div className="space-y-3 pt-2">
