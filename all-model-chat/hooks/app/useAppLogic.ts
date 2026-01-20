@@ -1,7 +1,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { AppSettings, ChatMessage, SideViewContent } from '../../types';
-import { CANVAS_SYSTEM_PROMPT, DEFAULT_SYSTEM_INSTRUCTION } from '../../constants/appConstants';
+import { CANVAS_SYSTEM_PROMPT, DEFAULT_SYSTEM_INSTRUCTION, BBOX_SYSTEM_PROMPT } from '../../constants/appConstants';
 import { useAppSettings } from '../core/useAppSettings';
 import { useChat } from '../chat/useChat';
 import { useAppUI } from '../core/useAppUI';
@@ -129,6 +129,7 @@ export const useAppLogic = () => {
         lockedApiKey: null,
         mediaResolution: newSettings.mediaResolution,
         safetySettings: newSettings.safetySettings,
+        isRawModeEnabled: newSettings.isRawModeEnabled,
       }));
     }
   }, [setAppSettings, activeSessionId, setCurrentChatSettings]);
@@ -148,6 +149,25 @@ export const useAppLogic = () => {
         const textarea = document.querySelector('textarea[aria-label="Chat message input"]') as HTMLTextAreaElement;
         if (textarea) textarea.focus();
     }, 50);
+  }, [currentChatSettings.systemInstruction, setAppSettings, activeSessionId, setCurrentChatSettings]);
+
+  const handleToggleBBoxMode = useCallback(() => {
+    const isCurrentlyBBox = currentChatSettings.systemInstruction === BBOX_SYSTEM_PROMPT;
+    if (isCurrentlyBBox) {
+        setAppSettings(prev => ({...prev, systemInstruction: DEFAULT_SYSTEM_INSTRUCTION, isCodeExecutionEnabled: false}));
+        if (activeSessionId && setCurrentChatSettings) {
+            setCurrentChatSettings(prev => ({ ...prev, systemInstruction: DEFAULT_SYSTEM_INSTRUCTION, isCodeExecutionEnabled: false }));
+        }
+    } else {
+        setAppSettings(prev => ({...prev, systemInstruction: BBOX_SYSTEM_PROMPT, isCodeExecutionEnabled: true}));
+        if (activeSessionId && setCurrentChatSettings) {
+            setCurrentChatSettings(prev => ({
+                ...prev,
+                systemInstruction: BBOX_SYSTEM_PROMPT,
+                isCodeExecutionEnabled: true // Force enable code execution
+            }));
+        }
+    }
   }, [currentChatSettings.systemInstruction, setAppSettings, activeSessionId, setCurrentChatSettings]);
   
   const { isAutoSendOnSuggestionClick } = appSettings;
@@ -203,6 +223,7 @@ export const useAppLogic = () => {
     activeChat, sessionTitle,
     handleSaveSettings,
     handleLoadCanvasPromptAndSave,
+    handleToggleBBoxMode,
     handleSuggestionClick,
     handleSetThinkingLevel,
     getCurrentModelDisplayName

@@ -1,7 +1,7 @@
 
 import { useMemo } from 'react';
 import { useAppLogic } from './useAppLogic';
-import { CANVAS_SYSTEM_PROMPT } from '../../constants/appConstants';
+import { CANVAS_SYSTEM_PROMPT, BBOX_SYSTEM_PROMPT } from '../../constants/appConstants';
 import { getShortcutDisplay } from '../../utils/shortcutUtils';
 
 export const useAppProps = (logic: ReturnType<typeof useAppLogic>) => {
@@ -18,6 +18,7 @@ export const useAppProps = (logic: ReturnType<typeof useAppLogic>) => {
     sessionTitle,
     handleSaveSettings,
     handleLoadCanvasPromptAndSave,
+    handleToggleBBoxMode,
     handleSuggestionClick,
     handleSetThinkingLevel,
     getCurrentModelDisplayName,
@@ -58,7 +59,21 @@ export const useAppProps = (logic: ReturnType<typeof useAppLogic>) => {
     newChatShortcut: getShortcutDisplay('general.newChat', appSettings),
   }), [
     uiState.isHistorySidebarOpen, chatState.savedSessions, chatState.savedGroups, chatState.activeSessionId,
-    chatState.loadingSessionIds, chatState.generatingTitleSessionIds, currentTheme, language, t, appSettings
+    chatState.loadingSessionIds, chatState.generatingTitleSessionIds, currentTheme, language, t, appSettings,
+    chatState.startNewChat,
+    chatState.loadChatSession,
+    chatState.handleDeleteChatHistorySession,
+    chatState.handleRenameSession,
+    chatState.handleTogglePinCurrentSession,
+    chatState.handleDuplicateSession,
+    chatState.handleAddNewGroup,
+    chatState.handleDeleteGroup,
+    chatState.handleRenameGroup,
+    chatState.handleMoveSessionToGroup,
+    chatState.handleToggleGroupExpansion,
+    uiState.setIsSettingsModalOpen,
+    uiState.setIsPreloadedMessagesModalOpen,
+    setIsExportModalOpen
   ]);
 
   // Chat Area Props
@@ -86,6 +101,8 @@ export const useAppProps = (logic: ReturnType<typeof useAppLogic>) => {
     isHistorySidebarOpen: uiState.isHistorySidebarOpen,
     onLoadCanvasPrompt: handleLoadCanvasPromptAndSave,
     isCanvasPromptActive: chatState.currentChatSettings.systemInstruction === CANVAS_SYSTEM_PROMPT,
+    isBBoxModeActive: chatState.currentChatSettings.systemInstruction === BBOX_SYSTEM_PROMPT,
+    onToggleBBox: handleToggleBBoxMode,
     isKeyLocked: !!chatState.currentChatSettings.lockedApiKey,
     themeId: currentTheme.id,
     modelsLoadingError: null,
@@ -109,6 +126,7 @@ export const useAppProps = (logic: ReturnType<typeof useAppLogic>) => {
     onFollowUpSuggestionClick: (text: string) => handleSuggestionClick('follow-up', text),
     onTextToSpeech: chatState.handleTextToSpeech,
     onGenerateCanvas: chatState.handleGenerateCanvas,
+    onContinueGeneration: chatState.handleContinueGeneration,
     ttsMessageId: chatState.ttsMessageId,
     language,
     scrollNavVisibility: chatState.scrollNavVisibility,
@@ -170,7 +188,7 @@ export const useAppProps = (logic: ReturnType<typeof useAppLogic>) => {
     t,
   }), [
     chatState, uiState, appSettings, currentTheme, language, t, sessionTitle, 
-    pipState, handleLoadCanvasPromptAndSave, handleSuggestionClick, handleSetThinkingLevel, 
+    pipState, handleLoadCanvasPromptAndSave, handleToggleBBoxMode, handleSuggestionClick, handleSetThinkingLevel, 
     handleOpenSidePanel, getCurrentModelDisplayName
   ]);
 

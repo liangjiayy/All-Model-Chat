@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import { ChatInputToolbar } from './ChatInputToolbar';
 import { ChatInputActions } from './ChatInputActions';
@@ -70,6 +71,8 @@ export interface ChatInputAreaProps {
         show: boolean;
         onSuggestionClick: (suggestion: string) => void;
         onOrganizeInfoClick: (suggestion: string) => void;
+        onToggleBBox?: () => void;
+        isBBoxModeActive?: boolean;
     };
     liveStatusProps?: {
         isConnected: boolean;
@@ -118,17 +121,21 @@ export const ChatInputArea: React.FC<ChatInputAreaProps> = ({
 
     return (
         <div className={wrapperClass} aria-hidden={isUIBlocked}>
-            <div className={innerContainerClass}>
-                {suggestionsProps && !isFullscreen && (
+            <div className="mx-auto w-full max-w-4xl px-2 sm:px-3">
+                 {suggestionsProps && !isFullscreen && (
                     <ChatSuggestions 
                         show={suggestionsProps.show}
                         onSuggestionClick={suggestionsProps.onSuggestionClick}
                         onOrganizeInfoClick={suggestionsProps.onOrganizeInfoClick}
+                        onToggleBBox={suggestionsProps.onToggleBBox}
+                        isBBoxModeActive={suggestionsProps.isBBoxModeActive}
                         t={t}
                         isFullscreen={isFullscreen}
                     />
                 )}
+            </div>
 
+            <div className={innerContainerClass}>
                 <ChatInputToolbar {...toolbarProps} />
                 
                 {liveStatusProps && (
@@ -177,7 +184,7 @@ export const ChatInputArea: React.FC<ChatInputAreaProps> = ({
                             isConverting={isConverting}
                         />
 
-                        <div className="flex items-center justify-between w-full flex-shrink-0 mt-auto pt-1">
+                        <div className="flex items-center justify-between w-full flex-shrink-0 mt-auto pt-1 relative z-10">
                             <ChatInputActions {...actionsProps} />
                             
                             {/* Hidden inputs */}
